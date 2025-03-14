@@ -16,7 +16,7 @@ def get_nutritional_data(ingredient):
         response = requests.get(BASE_URL, params=params)
         response.raise_for_status()
         data = response.json()
-        print(f"Respuesta de la API para {ingredient}: {data}")  # Depuración
+        print(f"Respuesta de la API para {ingredient}: {data}")
         if data['foods']:
             food = data['foods'][0]
             nutrients = {n['nutrientName']: n['value'] for n in food['foodNutrients']}

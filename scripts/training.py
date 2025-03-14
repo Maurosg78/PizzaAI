@@ -40,7 +40,7 @@ except FileNotFoundError:
         'cauliflower_ratio': [1.0, 0.8, 0.6, 0.4, 0.2, 0.0],
         'chickpea_ratio': [0.0, 0.2, 0.4, 0.6, 0.8, 1.0],
         'elasticity': [0.4, 0.5, 0.6, 0.7, 0.8, 0.9],
-        'density': [0.9, 0.85, 0.8, 0.75, 0.7, 0.65]  # Simulación básica de densidad
+        'density': [0.9, 0.85, 0.8, 0.75, 0.7, 0.65]
     })
     df_exp.to_csv('data/experimental_data.csv', index=False)
 
