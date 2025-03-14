@@ -1,0 +1,25 @@
+# Entornos virtuales
+venv/
+env/
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
+
+# Archivos de configuración local
+.env
+
+# Caché y temporales de Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Carpetas de build y dist
+build/
+dist/
+
+# Archivos de datos grandes (opcional)
+data/*.csv
+
+# Configuraciones de VS Code
+.vscode/
