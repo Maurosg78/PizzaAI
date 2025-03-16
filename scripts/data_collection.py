@@ -1,12 +1,12 @@
 import requests
 import csv
 import os
-import pandas as pd
 
 API_KEY = 'Rntzc9HDaefGgZL0w3Sid120qfk4kdJD4YZuicE4'
 BASE_URL = 'https://api.nal.usda.gov/fdc/v1/foods/search'
 
 def get_nutritional_data(ingredient):
+    """Obtiene datos nutricionales de un ingrediente usando la API de USDA."""
     params = {
         'query': ingredient,
         'api_key': API_KEY,
@@ -14,21 +14,19 @@ def get_nutritional_data(ingredient):
     }
     try:
         response = requests.get(BASE_URL, params=params)
-        response.raise_for_status()
+        response.raise_for_status()  # Lanza una excepción si la solicitud falla
         data = response.json()
-        print(f"Respuesta de la API para {ingredient}: {data}")
-        if data['foods']:
+        print(f"Respuesta de la API para {ingredient}: {data}")  # Depuración
+        if 'foods' in data and data['foods']:  # Verifica que haya datos
             food = data['foods'][0]
             nutrients = {n['nutrientName']: n['value'] for n in food['foodNutrients']}
-            result = {
+            return {
                 'ingredient': ingredient,
                 'calories': nutrients.get('Energy', 0),
                 'protein': nutrients.get('Protein', 0),
                 'carbs': nutrients.get('Carbohydrate, by difference', 0),
                 'fat': nutrients.get('Total lipid (fat)', 0)
             }
-            print(f"Datos recolectados para {ingredient}: {result}")
-            return result
         else:
             print(f"No se encontraron datos para {ingredient}")
             return None
@@ -36,36 +34,23 @@ def get_nutritional_data(ingredient):
         print(f"Error al consultar {ingredient}: {e}")
         return None
 
-def save_to_csv(data, filename='nutritional_data.csv'):
-    filepath = os.path.join('data', filename)
+def save_to_csv(data, filename):
+    """Guarda los datos en un archivo CSV en la ruta especificada."""
+    filepath = filename
+    # Crear el directorio si no existe
+    os.makedirs(os.path.dirname(filepath), exist_ok=True)
     fieldnames = ['ingredient', 'calories', 'protein', 'carbs', 'fat']
-    
-    if os.path.exists(filepath):
-        try:
-            existing_data = pd.read_csv(filepath)
-            if existing_data.empty or set(existing_data.columns) != set(fieldnames):
-                print(f"Archivo {filename} vacío o con estructura incorrecta. Regenerando.")
-                os.remove(filepath)
-            elif data['ingredient'] in existing_data['ingredient'].values:
-                print(f"{data['ingredient']} ya está en el archivo, no se añadirá.")
-                return
-        except (pd.errors.EmptyDataError, pd.errors.ParserError):
-            print(f"Archivo {filename} corrupto. Regenerando.")
-            os.remove(filepath)
-
-    with open(filepath, 'a', newline='') as file:
+    with open(filepath, 'w', newline='') as file:
         writer = csv.DictWriter(file, fieldnames=fieldnames)
-        if file.tell() == 0:
-            writer.writeheader()
-        writer.writerow(data)
-        print(f"Datos guardados para {data['ingredient']}")
+        writer.writeheader()
+        writer.writerows(data)
+    print(f"Datos guardados en {filepath}")
 
 if __name__ == "__main__":
-    ingredients = [
-        'cauliflower', 'chickpea', 'rice flour', 'potato flour', 'corn starch',
-        'olive oil', 'xanthan gum', 'sugar', 'salt'
-    ]
-    for ingredient in ingredients:
-        data = get_nutritional_data(ingredient)
-        if data:
-            save_to_csv(data)
+    ingredients = ['cauliflower', 'chickpea', 'rice flour']
+    # Recolecta datos y filtra valores None
+    data = [get_nutritional_data(ing) for ing in ingredients if get_nutritional_data(ing) is not None]
+    if data:
+        save_to_csv(data, './data/processed/nutritional_data.csv')
+    else:
+        print("No se encontraron datos para ningún ingrediente.")
