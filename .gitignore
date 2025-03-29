@@ -1,25 +1,62 @@
-# Entornos virtuales
-venv/
-env/
-
-# Archivos del sistema operativo
-.DS_Store
-Thumbs.db
-
-# Archivos de configuración local
-.env
-
-# Caché y temporales de Python
+# Python
 __pycache__/
-*.pyc
-*.pyo
-
-# Carpetas de build y dist
+*.py[cod]
+*$py.class
+*.so
+.Python
 build/
+develop-eggs/
 dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
 
-# Archivos de datos grandes (opcional)
-data/*.csv
+# Virtual Environment
+.env
+.venv
+env/
+venv/
+ENV/
 
-# Configuraciones de VS Code
+# IDE
+.idea/
 .vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Testing
+.coverage
+coverage.xml
+htmlcov/
+.pytest_cache/
+.tox/
+
+# Logs
+*.log
+logs/
+log/
+
+# Local development
+*.db
+*.sqlite3
+uploads/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
+
+# Environment variables
+.env.local
+
+# OS
+Thumbs.db
