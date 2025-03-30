@@ -1,76 +1,76 @@
 name: Repository Setup - Part 2
-
-on:
-  workflow_dispatch:
+on: workflow_dispatch
 
 jobs:
   setup:
     runs-on: ubuntu-latest
-    permissions:
-      issues: write
-      contents: write
     steps:
-      - uses: actions/checkout@v1
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
       - name: Create More Issues
-        uses: actions/github-script@v3
+        uses: actions/github-script@v5
+        env:
+          GH_PAT: ${{ secrets.GH_TOKEN }}
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const getMilestoneId = async (title) => {
-              const milestones = await github.issues.listMilestones({
+            async function getMilestoneId(title) {
+              const milestones = await github.rest.issues.listMilestones({
                 owner: context.repo.owner,
-                repo: context.repo.repo
+                repo: context.repo.repo,
+                state: 'open'
               });
-              return milestones.data.find(m => m.title.includes(title)).number;
-            };
-            
-            const sprint1 = await getMilestoneId('Sprint 1');
-            const sprint2 = await getMilestoneId('Sprint 2');
-            const sprint3 = await getMilestoneId('Sprint 3');
-            
+              
+              const milestone = milestones.data.find(m => m.title.includes(title));
+              return milestone ? milestone.number : null;
+            }
+
+            const sprint1Id = await getMilestoneId('Sprint 1');
+            const sprint2Id = await getMilestoneId('Sprint 2');
+            const sprint3Id = await getMilestoneId('Sprint 3');
+
             const issues = [
               {
                 title: '📊 Setup de Monitoreo y Logging',
-                body: `## Objetivo\nImplementar un sistema robusto de monitoreo y logging para la aplicación.\n\n## Tareas\n### Setup de Prometheus\n- [ ] Configuración básica\n- [ ] Métricas personalizadas\n- [ ] Alerting rules\n\n### Configuración de Grafana\n- [ ] Dashboard inicial\n- [ ] Paneles de métricas\n- [ ] Alertas visuales\n\n### Sistema de Logging\n- [ ] Logging estructurado\n- [ ] Rotación de logs\n- [ ] Niveles de log`,
-                milestone: sprint1,
-                labels: ['infrastructure', 'monitoring', 'medium-priority']
+                body: '## Descripción\nConfigurar el sistema de monitoreo y logging para la aplicación.\n\n## Tareas\n- [ ] Implementar logging estructurado\n- [ ] Configurar métricas de aplicación\n- [ ] Implementar trazabilidad distribuida\n- [ ] Configurar dashboards de monitoreo\n\n## Criterios de Aceptación\n- Sistema de logging implementado y funcionando\n- Métricas siendo recolectadas\n- Dashboards configurados y mostrando datos',
+                milestone: sprint1Id,
+                labels: ['monitoring', 'infrastructure']
               },
               {
                 title: '🗄️ Diseño e Implementación del Modelo de Datos',
                 body: `## Objetivo\nDiseñar e implementar el modelo de datos para el sistema de recomendación.\n\n## Tareas\n### Diseño del Esquema\n- [ ] Modelos de usuario\n- [ ] Modelos de recetas\n- [ ] Modelos de ingredientes\n\n### Sistema de Persistencia\n- [ ] Configuración de PostgreSQL\n- [ ] Migraciones\n- [ ] Índices y optimizaciones`,
-                milestone: sprint2,
+                milestone: sprint2Id,
                 labels: ['backend', 'high-priority']
               },
               {
                 title: '🔌 Desarrollo de API Core',
                 body: `## Objetivo\nImplementar la API REST para el sistema.\n\n## Tareas\n### Endpoints Básicos\n- [ ] CRUD de usuarios\n- [ ] CRUD de recetas\n- [ ] CRUD de ingredientes\n\n### Sistema de Autenticación\n- [ ] JWT implementation\n- [ ] Roles y permisos\n- [ ] Rate limiting\n\n### Documentación API\n- [ ] OpenAPI/Swagger\n- [ ] Postman collection\n- [ ] Ejemplos de uso`,
-                milestone: sprint2,
+                milestone: sprint2Id,
                 labels: ['backend', 'high-priority']
               },
               {
                 title: '🧮 Implementación del Motor de Recomendación',
                 body: `## Objetivo\nDesarrollar el sistema de recomendación de recetas.\n\n## Tareas\n### Integración USDA\n- [ ] Cliente API\n- [ ] Caché de datos\n- [ ] Sincronización\n\n### Algoritmo de Recomendación\n- [ ] Lógica base\n- [ ] Filtros y ordenamiento\n- [ ] Personalización\n\n### Sistema de Caché\n- [ ] Configuración Redis\n- [ ] Estrategias de caché\n- [ ] Invalidación`,
-                milestone: sprint2,
+                milestone: sprint2Id,
                 labels: ['backend', 'high-priority']
               },
               {
                 title: '🎨 Desarrollo del Dashboard',
                 body: `## Objetivo\nCrear una interfaz de usuario moderna y funcional.\n\n## Tareas\n### Diseño UI/UX\n- [ ] Wireframes\n- [ ] Componentes base\n- [ ] Tema y estilos\n\n### Implementación Frontend\n- [ ] Setup React\n- [ ] Routing\n- [ ] Estado global\n\n### Integración API\n- [ ] Cliente HTTP\n- [ ] Manejo de errores\n- [ ] Loading states`,
-                milestone: sprint3,
+                milestone: sprint3Id,
                 labels: ['frontend', 'high-priority']
               },
               {
                 title: '📈 Implementación del Sistema de Monitoreo en Producción',
                 body: `## Objetivo\nImplementar un sistema completo de monitoreo para producción.\n\n## Tareas\n### Métricas de Negocio\n- [ ] KPIs\n- [ ] Reportes\n- [ ] Analytics\n\n### Sistema de Alertas\n- [ ] Configuración\n- [ ] Notificaciones\n- [ ] Escalamiento\n\n### Dashboard Operacional\n- [ ] Métricas en tiempo real\n- [ ] Logs centralizados\n- [ ] Estado del sistema`,
-                milestone: sprint3,
+                milestone: sprint3Id,
                 labels: ['monitoring', 'medium-priority']
               }
             ];
-            
+
             for (const issue of issues) {
               try {
-                await github.issues.create({
+                await github.rest.issues.create({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
                   title: issue.title,
@@ -80,6 +80,6 @@ jobs:
                 });
                 console.log(`Created issue: ${issue.title}`);
               } catch (error) {
-                console.log(`Error creating issue ${issue.title}: ${error}`);
+                console.error(`Error creating issue ${issue.title}: ${error}`);
               }
             } 

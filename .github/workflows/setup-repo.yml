@@ -10,29 +10,31 @@ jobs:
       issues: write
       contents: write
     steps:
-      - uses: actions/checkout@v1
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
       - name: Create Labels
-        uses: actions/github-script@v3
+        uses: actions/github-script@v5
+        env:
+          GH_PAT: ${{ secrets.GH_TOKEN }}
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const labels = [
-              { name: 'infrastructure', color: '0366d6', description: 'Infrastructure related tasks' },
-              { name: 'high-priority', color: 'd93f0b', description: 'High priority tasks' },
-              { name: 'medium-priority', color: 'fbca04', description: 'Medium priority tasks' },
-              { name: 'ci-cd', color: '0e8a16', description: 'CI/CD related tasks' },
-              { name: 'monitoring', color: '5319e7', description: 'Monitoring and observability' },
-              { name: 'backend', color: '1d76db', description: 'Backend development' },
-              { name: 'frontend', color: 'b60205', description: 'Frontend development' },
-              { name: 'documentation', color: '0075ca', description: 'Documentation updates' },
-              { name: 'bug', color: 'd73a4a', description: 'Something isnt working' },
-              { name: 'enhancement', color: 'a2eeef', description: 'New feature or request' }
+              {name: 'infrastructure', color: '0366d6', description: 'Infrastructure related tasks'},
+              {name: 'high-priority', color: 'd93f0b', description: 'High priority tasks'},
+              {name: 'medium-priority', color: 'fbca04', description: 'Medium priority tasks'},
+              {name: 'ci-cd', color: '0e8a16', description: 'CI/CD related tasks'},
+              {name: 'monitoring', color: '5319e7', description: 'Monitoring related tasks'},
+              {name: 'backend', color: '1d76db', description: 'Backend related tasks'},
+              {name: 'frontend', color: 'b60205', description: 'Frontend related tasks'},
+              {name: 'documentation', color: '0075ca', description: 'Documentation tasks'},
+              {name: 'bug', color: 'd73a4a', description: 'Something isn\'t working'},
+              {name: 'enhancement', color: 'a2eeef', description: 'New feature or request'}
             ];
-            
+
             for (const label of labels) {
               try {
-                await github.issues.createLabel({
+                await github.rest.issues.createLabel({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
                   name: label.name,
@@ -41,7 +43,11 @@ jobs:
                 });
                 console.log(`Created label: ${label.name}`);
               } catch (error) {
-                console.log(`Label ${label.name} may already exist`);
+                if (error.status === 422) {
+                  console.log(`Label ${label.name} already exists`);
+                } else {
+                  throw error;
+                }
               }
             }
 
