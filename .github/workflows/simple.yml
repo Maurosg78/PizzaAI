@@ -9,13 +9,12 @@ jobs:
       contents: read
       checks: write
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v1
       
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v1
         with:
           python-version: '3.9'
-          cache: 'pip'
       
       - name: Install dependencies
         run: |
@@ -44,7 +43,7 @@ jobs:
           
       - name: Upload coverage report
         if: always()  # Intentar subir el reporte incluso si hay fallos
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v1
         with:
           file: ./coverage.xml
           fail_ci_if_error: false  # No fallar si hay problemas con Codecov 
