@@ -10,10 +10,10 @@ jobs:
       issues: write
       contents: write
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v1
 
       - name: Create Labels
-        uses: actions/github-script@v6
+        uses: actions/github-script@v3
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
@@ -32,7 +32,7 @@ jobs:
             
             for (const label of labels) {
               try {
-                await github.rest.issues.createLabel({
+                await github.issues.createLabel({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
                   name: label.name,
@@ -46,7 +46,7 @@ jobs:
             }
 
       - name: Create Milestones
-        uses: actions/github-script@v6
+        uses: actions/github-script@v3
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
@@ -70,7 +70,7 @@ jobs:
             
             for (const milestone of milestones) {
               try {
-                await github.rest.issues.createMilestone({
+                await github.issues.createMilestone({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
                   title: milestone.title,
@@ -84,12 +84,12 @@ jobs:
             }
 
       - name: Create Initial Issues
-        uses: actions/github-script@v6
+        uses: actions/github-script@v3
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const getMilestoneId = async (title) => {
-              const milestones = await github.rest.issues.listMilestones({
+              const milestones = await github.issues.listMilestones({
                 owner: context.repo.owner,
                 repo: context.repo.repo
               });
@@ -115,7 +115,7 @@ jobs:
             
             for (const issue of issues) {
               try {
-                await github.rest.issues.create({
+                await github.issues.create({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
                   title: issue.title,
