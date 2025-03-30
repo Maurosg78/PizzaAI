@@ -5,16 +5,13 @@ on: [push]
 jobs:
   test:
     runs-on: ubuntu-latest
-    permissions: {}  # Sin permisos especiales
     steps:
-      - uses: actions/checkout@v2  # Versión estable y ampliamente usada
+      - uses: actions/checkout@v1
       
       - name: Set up Python
-        uses: actions/setup-python@v2  # Versión estable y ampliamente usada
+        uses: actions/setup-python@v1
         with:
           python-version: '3.9'
       
       - name: Test Python
-        run: |
-          python --version
-          python -c "print('Hello from GitHub Actions!')" 
+        run: python --version 
