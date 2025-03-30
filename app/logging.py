@@ -1,0 +1,43 @@
+import logging
+import sys
+from typing import Optional
+
+from .config import settings
+
+def setup_logging(
+    level: Optional[str] = None,
+    format: Optional[str] = None
+) -> None:
+    """Configure logging for the application.
+
+    Args:
+        level: Logging level (default: from settings)
+        format: Log format string (default: from settings)
+    """
+    # Set level and format from settings if not provided
+    level = level or settings.LOG_LEVEL
+    format = format or settings.LOG_FORMAT
+
+    # Configure root logger
+    logging.basicConfig(
+        level=level,
+        format=format,
+        handlers=[
+            logging.StreamHandler(sys.stdout),
+            logging.FileHandler("app.log")
+        ]
+    )
+
+    # Configure third-party loggers
+    logging.getLogger("uvicorn").setLevel(logging.INFO)
+    logging.getLogger("uvicorn.access").setLevel(logging.INFO)
+    logging.getLogger("fastapi").setLevel(logging.INFO)
+    logging.getLogger("redis").setLevel(logging.WARNING)
+    logging.getLogger("httpx").setLevel(logging.WARNING)
+
+    # Create logger for this module
+    logger = logging.getLogger(__name__)
+    logger.info("Logging configured successfully")
+
+# Create logger instance
+logger = logging.getLogger(__name__) 
