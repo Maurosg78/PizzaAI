@@ -10,12 +10,12 @@ jobs:
       issues: write
       contents: write
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Create More Issues
-        uses: actions/github-script@v5
+        uses: actions/github-script@v6
         with:
-          github-token: ${{ secrets.GH_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const getMilestoneId = async (title) => {
               const milestones = await github.rest.issues.listMilestones({

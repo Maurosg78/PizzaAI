@@ -10,12 +10,12 @@ jobs:
       issues: write
       contents: write
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Create Labels
-        uses: actions/github-script@v5
+        uses: actions/github-script@v6
         with:
-          github-token: ${{ secrets.GH_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const labels = [
               { name: 'infrastructure', color: '0366d6', description: 'Infrastructure related tasks' },
@@ -46,9 +46,9 @@ jobs:
             }
 
       - name: Create Milestones
-        uses: actions/github-script@v5
+        uses: actions/github-script@v6
         with:
-          github-token: ${{ secrets.GH_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const milestones = [
               {
@@ -84,9 +84,9 @@ jobs:
             }
 
       - name: Create Initial Issues
-        uses: actions/github-script@v5
+        uses: actions/github-script@v6
         with:
-          github-token: ${{ secrets.GH_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const getMilestoneId = async (title) => {
               const milestones = await github.rest.issues.listMilestones({
