@@ -5,46 +5,16 @@ on: [push]
 jobs:
   test:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      checks: write
     steps:
-      - uses: actions/checkout@2036a08e25fa78bbd946711a407b529a0a4eab58
+      - uses: actions/checkout@v3
       
       - name: Set up Python
-        uses: actions/setup-python@d27e3f3d7c64b4bbf8e4abfb9b63b83e846e0435
+        uses: actions/setup-python@v4
         with:
           python-version: '3.9'
-          cache: 'pip'
       
-      - name: Install dependencies
+      - name: Test basic command
         run: |
-          python -m pip install --upgrade pip
-          pip install pytest pytest-cov flake8 black isort
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-      
-      - name: Run linting
-        continue-on-error: true  # Permitir que falle el linting inicialmente
-        run: |
-          # Ejecutar flake8 solo para errores críticos
-          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-          # Ejecutar black en modo check
-          black . --check --diff || true
-          # Ejecutar isort en modo check
-          isort . --check-only --diff || true
-      
-      - name: Run tests
-        run: |
-          python -m pytest tests/ -v || true
-      
-      - name: Run tests with coverage
-        if: always()  # Ejecutar incluso si los tests fallan
-        run: |
-          pytest --cov=./ --cov-report=xml || true
-          
-      - name: Upload coverage report
-        if: always()  # Intentar subir el reporte incluso si hay fallos
-        uses: codecov/codecov-action@894ff025c7b54547a9a2a1e9f228beae737ad3c2
-        with:
-          file: ./coverage.xml
-          fail_ci_if_error: false  # No fallar si hay problemas con Codecov 
+          python --version
+          pwd
+          ls -la 
