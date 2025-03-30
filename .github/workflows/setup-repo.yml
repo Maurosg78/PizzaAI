@@ -1,1 +1,130 @@
+name: Repository Setup
 
+on:
+  workflow_dispatch:
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: write
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Create Labels
+        uses: actions/github-script@v5
+        with:
+          github-token: ${{ secrets.GH_TOKEN }}
+          script: |
+            const labels = [
+              { name: 'infrastructure', color: '0366d6', description: 'Infrastructure related tasks' },
+              { name: 'high-priority', color: 'd93f0b', description: 'High priority tasks' },
+              { name: 'medium-priority', color: 'fbca04', description: 'Medium priority tasks' },
+              { name: 'ci-cd', color: '0e8a16', description: 'CI/CD related tasks' },
+              { name: 'monitoring', color: '5319e7', description: 'Monitoring and observability' },
+              { name: 'backend', color: '1d76db', description: 'Backend development' },
+              { name: 'frontend', color: 'b60205', description: 'Frontend development' },
+              { name: 'documentation', color: '0075ca', description: 'Documentation updates' },
+              { name: 'bug', color: 'd73a4a', description: 'Something isnt working' },
+              { name: 'enhancement', color: 'a2eeef', description: 'New feature or request' }
+            ];
+            
+            for (const label of labels) {
+              try {
+                await github.rest.issues.createLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name: label.name,
+                  color: label.color,
+                  description: label.description
+                });
+                console.log(`Created label: ${label.name}`);
+              } catch (error) {
+                console.log(`Label ${label.name} may already exist`);
+              }
+            }
+
+      - name: Create Milestones
+        uses: actions/github-script@v5
+        with:
+          github-token: ${{ secrets.GH_TOKEN }}
+          script: |
+            const milestones = [
+              {
+                title: 'Sprint 1: Infraestructura Base',
+                description: 'Configuración inicial del proyecto, CI/CD pipeline, y sistema de monitoreo y logging.',
+                due_on: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString()
+              },
+              {
+                title: 'Sprint 2: Sistema de Recomendación',
+                description: 'Implementación del core del sistema, incluyendo modelo de datos, API y motor de recomendación.',
+                due_on: new Date(Date.now() + 35 * 24 * 60 * 60 * 1000).toISOString()
+              },
+              {
+                title: 'Sprint 3: Frontend y UX',
+                description: 'Desarrollo del dashboard, implementación frontend y monitoreo en producción.',
+                due_on: new Date(Date.now() + 49 * 24 * 60 * 60 * 1000).toISOString()
+              }
+            ];
+            
+            for (const milestone of milestones) {
+              try {
+                await github.rest.issues.createMilestone({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  title: milestone.title,
+                  description: milestone.description,
+                  due_on: milestone.due_on
+                });
+                console.log(`Created milestone: ${milestone.title}`);
+              } catch (error) {
+                console.log(`Milestone ${milestone.title} may already exist`);
+              }
+            }
+
+      - name: Create Initial Issues
+        uses: actions/github-script@v5
+        with:
+          github-token: ${{ secrets.GH_TOKEN }}
+          script: |
+            const getMilestoneId = async (title) => {
+              const milestones = await github.rest.issues.listMilestones({
+                owner: context.repo.owner,
+                repo: context.repo.repo
+              });
+              return milestones.data.find(m => m.title.includes(title)).number;
+            };
+            
+            const sprint1 = await getMilestoneId('Sprint 1');
+            
+            const issues = [
+              {
+                title: '🚀 Configuración Inicial del Proyecto',
+                body: `## Objetivo\nEstablecer la estructura base del proyecto y configurar todas las herramientas necesarias para el desarrollo.\n\n## Tareas\n### Setup del Entorno de Desarrollo\n- [ ] Configurar entorno virtual Python\n- [ ] Instalar y configurar dependencias base\n- [ ] Configurar estructura de directorios\n- [ ] Setup inicial de Docker y Docker Compose\n\n### Configuración de Herramientas de Desarrollo\n- [ ] Implementar pre-commit hooks\n- [ ] Configurar linters (flake8, black, isort)\n- [ ] Setup del framework de testing\n- [ ] Configurar mypy para type checking\n\n### Documentación\n- [ ] Crear README inicial\n- [ ] Documentar proceso de instalación\n- [ ] Crear guía de contribución`,
+                milestone: sprint1,
+                labels: ['infrastructure', 'high-priority', 'documentation']
+              },
+              {
+                title: '⚙️ Implementar CI/CD Pipeline',
+                body: `## Objetivo\nImplementar un pipeline de integración y despliegue continuo robusto usando GitHub Actions.\n\n## Tareas\n### GitHub Actions Workflow\n- [ ] Configurar workflow de testing\n  - [ ] Unit tests\n  - [ ] Integration tests\n  - [ ] Coverage reports\n- [ ] Configurar análisis de código\n  - [ ] Linting checks\n  - [ ] Security scanning\n  - [ ] Type checking\n- [ ] Configurar build y push de Docker images\n\n### Integración con Servicios Externos\n- [ ] Configurar Docker Hub\n- [ ] Integrar Codecov\n- [ ] Configurar Snyk`,
+                milestone: sprint1,
+                labels: ['infrastructure', 'ci-cd', 'high-priority']
+              }
+            ];
+            
+            for (const issue of issues) {
+              try {
+                await github.rest.issues.create({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  title: issue.title,
+                  body: issue.body,
+                  milestone: issue.milestone,
+                  labels: issue.labels
+                });
+                console.log(`Created issue: ${issue.title}`);
+              } catch (error) {
+                console.log(`Error creating issue ${issue.title}: ${error}`);
+              }
+            }
