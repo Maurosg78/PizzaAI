@@ -24,23 +24,33 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pytest pytest-cov flake8 black
+          pip install pytest pytest-cov flake8 black isort mypy
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
       - name: Run linting
         run: |
-          # Ejecutar flake8 solo para errores críticos
+          echo "Running code quality checks..."
+          
+          echo "1. Checking imports with isort..."
+          isort . --check --diff || true
+          
+          echo "2. Checking format with black..."
+          black . --check --diff || true
+          
+          echo "3. Running flake8..."
           flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics || true
-          # Verificar formato con black
-          black . --check || true
+          
+          echo "4. Running type checks with mypy..."
+          mypy . --ignore-missing-imports || true
 
       - name: Run tests with coverage
         run: |
-          # Ejecutar tests con cobertura
-          pytest tests/ -v --cov=./ --cov-report=xml || echo "No tests found"
+          echo "Running tests with coverage..."
+          pytest tests/ -v --cov=./ --cov-report=xml --cov-report=term || echo "No tests found"
           
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v2
         with:
           file: ./coverage.xml
-          fail_ci_if_error: false 
+          fail_ci_if_error: false
+          verbose: true 
