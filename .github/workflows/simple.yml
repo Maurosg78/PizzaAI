@@ -5,11 +5,12 @@ on: [push]
 jobs:
   test:
     runs-on: ubuntu-latest
+    permissions: {}  # Sin permisos especiales
     steps:
-      - uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v2.5.0
+      - uses: actions/checkout@v2  # Versión estable y ampliamente usada
       
       - name: Set up Python
-        uses: actions/setup-python@7f80679172b057fc5e90d70d197929d454754a5a # v2.3.0
+        uses: actions/setup-python@v2  # Versión estable y ampliamente usada
         with:
           python-version: '3.9'
       
