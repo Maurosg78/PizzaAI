@@ -2,6 +2,11 @@ from typing import Dict, List, Optional
 import httpx
 from pydantic import BaseModel
 from ..config import settings
+import logging
+from ..cache.redis_cache import RedisCache
+from .usda_client import USDAClient
+
+logger = logging.getLogger(__name__)
 
 class NutrientInfo(BaseModel):
     """Información nutricional de un alimento"""
@@ -19,95 +24,57 @@ class FoodItem(BaseModel):
     serving_size_unit: str
 
 class USDAService:
-    """Servicio para interactuar con la API de USDA"""
+    """Servicio para interactuar con la API de USDA."""
     
     def __init__(self):
-        self.api_key = settings.USDA_API_KEY.get_secret_value()
-        self.base_url = settings.USDA_API_BASE_URL
-        self.headers = {
-            "X-Api-Key": self.api_key,
-            "Content-Type": "application/json"
-        }
+        """Inicializa el servicio con el cliente USDA y caché Redis."""
+        self.client = USDAClient()
+        self.cache = RedisCache()
+        
+    def _generate_cache_key(self, prefix: str, params: Dict) -> str:
+        """Genera una clave de caché única basada en los parámetros."""
+        return f"usda:{prefix}:{':'.join(f'{k}={v}' for k, v in sorted(params.items()))}"
     
-    async def search_foods(self, query: str, page_size: int = 25) -> List[Dict]:
-        """
-        Busca alimentos en la base de datos de USDA
+    def search_foods(self, query: str, page_size: int = 10) -> Dict:
+        """Busca alimentos en la USDA API con caché."""
+        cache_key = self._generate_cache_key("search", {"query": query, "page_size": page_size})
         
-        Args:
-            query: Término de búsqueda
-            page_size: Número de resultados por página
-            
-        Returns:
-            Lista de alimentos encontrados
-        """
-        async with httpx.AsyncClient() as client:
-            response = await client.get(
-                f"{self.base_url}/foods/search",
-                headers=self.headers,
-                params={
-                    "query": query,
-                    "pageSize": page_size
-                }
-            )
-            response.raise_for_status()
-            data = response.json()
-            return data.get("foods", [])
+        # Intentar obtener de caché
+        cached_result = self.cache.get(cache_key)
+        if cached_result:
+            logger.info(f"Cache hit para búsqueda: {query}")
+            return cached_result
+        
+        # Si no está en caché, hacer la petición
+        logger.info(f"Realizando búsqueda en USDA API: {query}")
+        result = self.client.search_foods(query, page_size)
+        
+        # Almacenar en caché por 1 hora
+        self.cache.set(cache_key, result, expire=3600)
+        return result
     
-    async def get_food_details(self, fdc_id: int) -> Optional[Dict]:
-        """
-        Obtiene detalles de un alimento específico
+    def get_food_details(self, fdc_id: int) -> Dict:
+        """Obtiene detalles de un alimento específico con caché."""
+        cache_key = self._generate_cache_key("food", {"fdc_id": fdc_id})
         
-        Args:
-            fdc_id: ID del alimento en la base de datos de USDA
-            
-        Returns:
-            Detalles del alimento o None si no se encuentra
-        """
-        async with httpx.AsyncClient() as client:
-            response = await client.get(
-                f"{self.base_url}/food/{fdc_id}",
-                headers=self.headers
-            )
-            if response.status_code == 404:
-                return None
-            response.raise_for_status()
-            return response.json()
+        # Intentar obtener de caché
+        cached_result = self.cache.get(cache_key)
+        if cached_result:
+            logger.info(f"Cache hit para alimento: {fdc_id}")
+            return cached_result
+        
+        # Si no está en caché, hacer la petición
+        logger.info(f"Obteniendo detalles de alimento: {fdc_id}")
+        result = self.client.get_food_details(fdc_id)
+        
+        # Almacenar en caché por 24 horas
+        self.cache.set(cache_key, result, expire=86400)
+        return result
     
-    async def get_nutrient_info(self, fdc_id: int) -> List[NutrientInfo]:
-        """
-        Obtiene información nutricional de un alimento
-        
-        Args:
-            fdc_id: ID del alimento en la base de datos de USDA
-            
-        Returns:
-            Lista de nutrientes con sus valores
-        """
-        food_data = await self.get_food_details(fdc_id)
-        if not food_data:
-            return []
-        
-        nutrients = []
-        for nutrient_data in food_data.get("foodNutrients", []):
-            # Verificar que todos los campos requeridos estén presentes y sean válidos
-            nutrient = nutrient_data.get("nutrient", {})
-            nutrient_id = nutrient.get("id")
-            nutrient_name = nutrient.get("name")
-            value = nutrient_data.get("amount")
-            unit = nutrient.get("unitName")
-            
-            if all([nutrient_id, nutrient_name, value is not None, unit]):
-                try:
-                    nutrients.append(NutrientInfo(
-                        nutrient_id=nutrient_id,
-                        nutrient_name=nutrient_name,
-                        value=float(value),
-                        unit=unit
-                    ))
-                except (ValueError, TypeError):
-                    continue  # Ignorar nutrientes con valores inválidos
-        
-        return nutrients
+    def get_nutrient_info(self, fdc_id: int) -> List[Dict]:
+        """Obtiene información nutricional de un alimento específico."""
+        food_details = self.get_food_details(fdc_id)
+        return food_details.get('foodNutrients', [])
 
 # Crear una instancia global del servicio
 usda_service = USDAService() 

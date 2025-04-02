@@ -1,11 +1,12 @@
+import os
 from typing import Dict, List, Optional, Union
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import Field, SecretStr
 
 class Settings(BaseSettings):
     # Configuración de la aplicación
-    APP_NAME: str = "PizzaAI"
-    DEBUG: bool = False
+    APP_NAME: str = Field(default="PizzaAI", env="APP_NAME")
+    DEBUG: bool = Field(default=False, env="DEBUG")
     API_V1_STR: str = "/api/v1"
     
     # Configuración de seguridad
@@ -13,7 +14,7 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     
     # Configuración de la base de datos
-    DATABASE_URL: str = Field(default="sqlite:///./pizzaai.db")
+    DATABASE_URL: str = "sqlite:///./pizzaai.db"
     
     # Configuración de CORS
     BACKEND_CORS_ORIGINS: List[str] = Field(default=["*"])
@@ -26,7 +27,7 @@ class Settings(BaseSettings):
     API_PORT: int = 8000
     
     # Configuración de caché
-    CACHE_TTL: int = 3600  # 1 hora
+    CACHE_TTL: int = 3600  # 1 hora en segundos
     
     # Configuración de límites de API
     API_RATE_LIMIT: int = 100  # peticiones por minuto
@@ -46,14 +47,23 @@ class Settings(BaseSettings):
     METRICS_PORT: int = 9090
     
     # Configuración de APIs externas
-    USDA_API_KEY: SecretStr = Field(default="Rntzc9HDaefGgZL0w3Sid120qfk4kdJD4YZuicE4")
-    USDA_API_BASE_URL: str = "https://api.nal.usda.gov/fdc/v1"
+    USDA_API_KEY: str = "Rntzc9HDaefGgZL0w3Sid120qfk4kdJD4YZuicE4"
+    USDA_API_URL: str = "https://api.nal.usda.gov/fdc/v1"
+    
+    # Configuración de GitHub
+    GITHUB_TOKEN: Optional[str] = Field(default=None, env="GITHUB_TOKEN")
+    
+    # Configuración de Redis
+    REDIS_HOST: str = "localhost"
+    REDIS_PORT: int = 6379
+    REDIS_DB: int = 0
     
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
         case_sensitive=True,
-        validate_default=True
+        validate_default=True,
+        extra="allow"  # Permitir campos adicionales
     )
 
     @classmethod

@@ -1,11 +1,16 @@
-from typing import Any, Optional
 import json
+import logging
+from typing import Any, Optional
+
 import redis
-from datetime import timedelta
-from src.core.config import settings
+from pydantic import BaseModel
+
+from ..config import settings
+
+logger = logging.getLogger(__name__)
 
 class RedisCache:
-    """Implementación de caché usando Redis"""
+    """Servicio de caché usando Redis."""
     
     def __init__(self):
         self.redis_client = redis.Redis(
@@ -15,27 +20,44 @@ class RedisCache:
             decode_responses=True
         )
     
-    async def get(self, key: str) -> Optional[Any]:
-        """Obtener valor del caché"""
-        value = self.redis_client.get(key)
-        return json.loads(value) if value else None
+    def get(self, key: str) -> Optional[Any]:
+        """Obtiene un valor de la caché."""
+        try:
+            value = self.redis_client.get(key)
+            if value:
+                return json.loads(value)
+        except Exception as e:
+            logger.error(f"Error al obtener valor de caché: {str(e)}")
+        return None
     
-    async def set(self, key: str, value: Any, ttl: timedelta) -> bool:
-        """Guardar valor en caché con TTL"""
-        return self.redis_client.setex(
-            key,
-            int(ttl.total_seconds()),
-            json.dumps(value)
-        )
+    def set(self, key: str, value: Any, expire: int = 3600) -> bool:
+        """Almacena un valor en la caché."""
+        try:
+            if isinstance(value, BaseModel):
+                value = value.dict()
+            self.redis_client.setex(
+                key,
+                expire,
+                json.dumps(value)
+            )
+            return True
+        except Exception as e:
+            logger.error(f"Error al almacenar valor en caché: {str(e)}")
+            return False
     
-    async def delete(self, key: str) -> bool:
-        """Eliminar valor del caché"""
-        return bool(self.redis_client.delete(key))
+    def delete(self, key: str) -> bool:
+        """Elimina un valor de la caché."""
+        try:
+            self.redis_client.delete(key)
+            return True
+        except Exception as e:
+            logger.error(f"Error al eliminar valor de caché: {str(e)}")
+            return False
     
-    async def clear(self) -> bool:
-        """Limpiar todo el caché"""
-        return bool(self.redis_client.flushdb())
-    
-    async def exists(self, key: str) -> bool:
-        """Verificar si existe una clave en el caché"""
-        return bool(self.redis_client.exists(key)) 
+    def exists(self, key: str) -> bool:
+        """Verifica si una clave existe en la caché."""
+        try:
+            return bool(self.redis_client.exists(key))
+        except Exception as e:
+            logger.error(f"Error al verificar existencia en caché: {str(e)}")
+            return False 

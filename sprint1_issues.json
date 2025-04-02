@@ -1,0 +1,44 @@
+{
+  "issues": [
+    {
+      "title": "S1-001: Configuración del Entorno de Desarrollo",
+      "body": "## Descripción\nConfigurar el entorno de desarrollo con todas las herramientas necesarias.\n\n## Tareas\n- [ ] Configurar entorno virtual Python\n- [ ] Instalar dependencias básicas\n- [ ] Configurar pre-commit hooks\n- [ ] Configurar linters\n- [ ] Configurar entorno de desarrollo local\n\n## Criterios de Aceptación\n- [ ] El entorno virtual está configurado\n- [ ] Todas las dependencias están instaladas\n- [ ] Los linters funcionan correctamente\n- [ ] Los pre-commit hooks están activos\n- [ ] El entorno local está listo para desarrollo",
+      "labels": ["sprint-1", "setup", "documentation"]
+    },
+    {
+      "title": "S1-002: Estructura del Proyecto",
+      "body": "## Descripción\nCrear la estructura básica del proyecto siguiendo las mejores prácticas.\n\n## Tareas\n- [ ] Crear estructura de directorios\n- [ ] Configurar archivos de configuración\n- [ ] Crear README inicial\n- [ ] Configurar .gitignore\n- [ ] Establecer estructura de documentación\n\n## Criterios de Aceptación\n- [ ] La estructura de directorios está creada\n- [ ] Los archivos de configuración están en su lugar\n- [ ] El README contiene información básica\n- [ ] El .gitignore está configurado correctamente\n- [ ] La documentación inicial está establecida",
+      "labels": ["sprint-1", "setup", "documentation"]
+    },
+    {
+      "title": "S1-003: Integración con GitHub",
+      "body": "## Descripción\nConfigurar la integración con GitHub y establecer los flujos de trabajo.\n\n## Tareas\n- [ ] Configurar repositorio remoto\n- [ ] Establecer ramas principales\n- [ ] Configurar protección de ramas\n- [ ] Crear templates de issues y PRs\n- [ ] Configurar webhooks\n\n## Criterios de Aceptación\n- [ ] El repositorio está configurado\n- [ ] Las ramas están protegidas\n- [ ] Los templates están creados\n- [ ] Los webhooks están configurados\n- [ ] Los flujos de trabajo están documentados",
+      "labels": ["sprint-1", "setup", "github"]
+    },
+    {
+      "title": "S1-004: Configuración de CI/CD",
+      "body": "## Descripción\nImplementar pipeline de integración y despliegue continuo.\n\n## Tareas\n- [ ] Configurar GitHub Actions\n- [ ] Establecer flujos de CI\n- [ ] Configurar tests automáticos\n- [ ] Implementar despliegue automático\n- [ ] Configurar monitoreo\n\n## Criterios de Aceptación\n- [ ] Los workflows de GitHub Actions están configurados\n- [ ] Los tests se ejecutan automáticamente\n- [ ] El despliegue es automático\n- [ ] El monitoreo está activo\n- [ ] La documentación está completa",
+      "labels": ["sprint-1", "devops", "ci-cd"]
+    },
+    {
+      "title": "S1-005: Sistema de Monitoreo",
+      "body": "## Descripción\nImplementar sistema de monitoreo del código y la infraestructura.\n\n## Tareas\n- [ ] Configurar monitoreo de código\n- [ ] Implementar alertas\n- [ ] Establecer métricas\n- [ ] Configurar dashboards\n- [ ] Documentar procesos\n\n## Criterios de Aceptación\n- [ ] El monitoreo está activo\n- [ ] Las alertas funcionan\n- [ ] Las métricas están establecidas\n- [ ] Los dashboards están configurados\n- [ ] La documentación está completa",
+      "labels": ["sprint-1", "devops", "monitoring"]
+    },
+    {
+      "title": "S1-006: Análisis de Masas de Referencia",
+      "body": "## Descripción\nRealizar análisis detallado de masas de trigo de referencia para establecer parámetros base.\n\n## Tareas\n- [ ] Investigar propiedades de masas de trigo\n- [ ] Documentar características clave\n- [ ] Establecer métricas de referencia\n- [ ] Crear base de datos inicial\n\n## Criterios de Aceptación\n- [ ] Documento de análisis completo\n- [ ] Base de datos con propiedades de referencia\n- [ ] Métricas establecidas\n- [ ] Documentación técnica actualizada",
+      "labels": ["sprint-1", "research", "analysis"]
+    },
+    {
+      "title": "S1-007: Evaluación de Ingredientes Alternativos",
+      "body": "## Descripción\nEvaluar y catalogar ingredientes alternativos para formulaciones sin gluten.\n\n## Tareas\n- [ ] Investigar ingredientes potenciales\n- [ ] Evaluar propiedades nutricionales\n- [ ] Analizar disponibilidad y costos\n- [ ] Documentar hallazgos\n\n## Criterios de Aceptación\n- [ ] Catálogo de ingredientes creado\n- [ ] Propiedades nutricionales documentadas\n- [ ] Análisis de costos completo\n- [ ] Base de datos de ingredientes inicial",
+      "labels": ["sprint-1", "research", "ingredients"]
+    },
+    {
+      "title": "S1-008: Investigación de Colorantes Naturales",
+      "body": "## Descripción\nInvestigar y evaluar colorantes naturales para las formulaciones.\n\n## Tareas\n- [ ] Identificar fuentes naturales\n- [ ] Evaluar estabilidad\n- [ ] Analizar impacto nutricional\n- [ ] Documentar resultados\n\n## Criterios de Aceptación\n- [ ] Lista de colorantes naturales evaluados\n- [ ] Documentación de propiedades\n- [ ] Guía de uso\n- [ ] Base de datos de colorantes",
+      "labels": ["sprint-1", "research", "colors"]
+    }
+  ]
+} 

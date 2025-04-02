@@ -1,0 +1,24 @@
+{
+  "issues": [
+    {
+      "title": "S2-001: Implementación de Modelos Base",
+      "body": "## Descripción\nImplementar los modelos base para el manejo de datos y cálculos.\n\n## Tareas\n- [ ] Crear modelo de datos base\n- [ ] Implementar validaciones\n- [ ] Configurar serialización\n- [ ] Documentar modelos\n\n## Criterios de Aceptación\n- [ ] Los modelos están implementados\n- [ ] Las validaciones funcionan\n- [ ] La serialización está configurada\n- [ ] La documentación está completa",
+      "labels": ["sprint-2", "backend", "model"]
+    },
+    {
+      "title": "S2-002: Integración con USDA API",
+      "body": "## Descripción\nIntegrar la API de USDA para obtener datos nutricionales.\n\n## Tareas\n- [ ] Configurar conexión con USDA API\n- [ ] Implementar parser de datos\n- [ ] Crear sistema de caché\n- [ ] Manejar errores y timeouts\n\n## Criterios de Aceptación\n- [ ] La conexión con USDA está establecida\n- [ ] Los datos se parsean correctamente\n- [ ] El sistema de caché funciona\n- [ ] Los errores se manejan adecuadamente",
+      "labels": ["sprint-2", "api", "integration"]
+    },
+    {
+      "title": "S2-003: Sistema de Recomendaciones Básico",
+      "body": "## Descripción\nDesarrollar el sistema básico de recomendaciones de ingredientes.\n\n## Tareas\n- [ ] Implementar algoritmo de recomendación\n- [ ] Crear sistema de scoring\n- [ ] Integrar con modelos base\n- [ ] Documentar proceso\n\n## Criterios de Aceptación\n- [ ] El algoritmo está implementado\n- [ ] El sistema de scoring funciona\n- [ ] Las recomendaciones son precisas\n- [ ] La documentación está completa",
+      "labels": ["sprint-2", "algorithm", "recommendation"]
+    },
+    {
+      "title": "S2-004: Tests Unitarios",
+      "body": "## Descripción\nImplementar suite de tests unitarios para el sistema.\n\n## Tareas\n- [ ] Configurar framework de testing\n- [ ] Crear tests para modelos\n- [ ] Crear tests para API\n- [ ] Crear tests para recomendaciones\n\n## Criterios de Aceptación\n- [ ] La cobertura de tests es > 90%\n- [ ] Todos los tests pasan\n- [ ] Los tests son mantenibles\n- [ ] La documentación está actualizada",
+      "labels": ["sprint-2", "testing", "quality"]
+    }
+  ]
+} 

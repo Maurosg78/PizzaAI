@@ -1,6 +1,7 @@
 import logging
 import sys
 from typing import Optional
+from datetime import datetime
 
 from .config import settings
 
@@ -24,7 +25,7 @@ def setup_logging(
         format=format,
         handlers=[
             logging.StreamHandler(sys.stdout),
-            logging.FileHandler("app.log")
+            logging.FileHandler(f'logs/app_{datetime.now().strftime("%Y%m%d")}.log')
         ]
     )
 

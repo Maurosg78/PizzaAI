@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Dict, List, Optional
 import numpy as np
 from pydantic import BaseModel
 
@@ -53,4 +53,48 @@ class NutritionAnalyzer:
         Optimizar la formulación para alcanzar el perfil nutricional objetivo
         """
         # TODO: Implementar optimización nutricional
-        pass 
+        pass
+
+    def calculate_nutritional_score(self, recipe: Recipe) -> float:
+        """Calcula el puntaje nutricional de una receta."""
+        if not recipe.ingredients:
+            return 0.0
+        
+        total_score = 0.0
+        total_weight = 0.0
+        
+        for ingredient in recipe.ingredients:
+            nutrition_data = self._get_ingredient_nutrition(ingredient)
+            if nutrition_data:
+                score = self._calculate_ingredient_score(nutrition_data)
+                weight = ingredient.quantity
+                total_score += score * weight
+                total_weight += weight
+            
+        return total_score / total_weight if total_weight > 0 else 0.0
+
+    def _get_ingredient_nutrition(self, ingredient: RecipeIngredient) -> Optional[Dict]:
+        """Obtiene los datos nutricionales de un ingrediente."""
+        try:
+            return self.usda_service.get_food_nutrition(ingredient.name)
+        except Exception as e:
+            logger.error(f"Error al obtener datos nutricionales: {str(e)}")
+            return None
+
+    def _calculate_ingredient_score(self, nutrition_data: Dict) -> float:
+        """Calcula el puntaje nutricional de un ingrediente."""
+        score = 0.0
+        
+        # Puntos por nutrientes beneficiosos
+        if 'protein' in nutrition_data:
+            score += nutrition_data['protein'] * 0.5
+        if 'fiber' in nutrition_data:
+            score += nutrition_data['fiber'] * 0.3
+        
+        # Penalización por nutrientes perjudiciales
+        if 'sugar' in nutrition_data:
+            score -= nutrition_data['sugar'] * 0.2
+        if 'saturated_fat' in nutrition_data:
+            score -= nutrition_data['saturated_fat'] * 0.3
+        
+        return max(0.0, min(10.0, score)) 

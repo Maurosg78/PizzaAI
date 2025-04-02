@@ -92,4 +92,52 @@ class LogisticsManager:
         Estimar tiempo de entrega
         """
         # TODO: Implementar estimación de tiempo de entrega
-        pass 
+        pass
+
+    def optimize_delivery_routes(self, orders: List[Order]) -> List[DeliveryRoute]:
+        """Optimiza las rutas de entrega para un conjunto de pedidos."""
+        if not orders:
+            return []
+        
+        # Agrupar pedidos por zona
+        zones = self._group_orders_by_zone(orders)
+        
+        # Optimizar rutas por zona
+        optimized_routes = []
+        for zone, zone_orders in zones.items():
+            route = self._optimize_zone_route(zone, zone_orders)
+            if route:
+                optimized_routes.append(route)
+            
+        return optimized_routes
+
+    def _group_orders_by_zone(self, orders: List[Order]) -> Dict[str, List[Order]]:
+        """Agrupa pedidos por zona geográfica."""
+        zones = {}
+        for order in orders:
+            zone = self._get_order_zone(order)
+            if zone not in zones:
+                zones[zone] = []
+            zones[zone].append(order)
+        return zones
+
+    def _optimize_zone_route(self, zone: str, orders: List[Order]) -> Optional[DeliveryRoute]:
+        """Optimiza la ruta para una zona específica."""
+        if not orders:
+            return None
+        
+        # Calcular centroide de la zona
+        centroid = self._calculate_zone_centroid(orders)
+        
+        # Ordenar pedidos por distancia al centroide
+        sorted_orders = sorted(
+            orders,
+            key=lambda o: self._calculate_distance(o.location, centroid)
+        )
+        
+        # Crear ruta optimizada
+        return DeliveryRoute(
+            zone=zone,
+            orders=sorted_orders,
+            estimated_time=self._calculate_route_time(sorted_orders)
+        ) 
