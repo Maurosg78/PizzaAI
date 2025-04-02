@@ -1,9 +1,12 @@
-from sqlalchemy import Column, Integer, Float, String, ForeignKey
+from sqlalchemy import Column, Float, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
+
 from .base import Base
+
 
 class RecipeIngredient(Base):
     """Modelo para la relación entre recetas e ingredientes."""
+
     __tablename__ = "recipe_ingredients"
 
     recipe_id = Column(Integer, ForeignKey("recipes.id"), primary_key=True)

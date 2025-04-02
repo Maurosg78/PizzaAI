@@ -1,9 +1,12 @@
-from sqlalchemy import Column, String, Integer, Float, JSON
+from sqlalchemy import JSON, Column, Float, Integer, String
 from sqlalchemy.orm import relationship
+
 from .base import Base, BaseModelMixin
+
 
 class Ingredient(Base, BaseModelMixin):
     """Modelo para ingredientes."""
+
     __tablename__ = "ingredients"
 
     name = Column(String(100), nullable=False)
@@ -16,6 +19,6 @@ class Ingredient(Base, BaseModelMixin):
     protein_per_unit = Column(Float)
     carbs_per_unit = Column(Float)
     fat_per_unit = Column(Float)
-    
+
     # Relación con recetas
     recipe_ingredients = relationship("RecipeIngredient", back_populates="ingredient")

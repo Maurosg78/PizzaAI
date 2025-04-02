@@ -9,17 +9,18 @@ from ..config import settings
 
 logger = logging.getLogger(__name__)
 
+
 class RedisCache:
     """Servicio de caché usando Redis."""
-    
+
     def __init__(self):
         self.redis_client = redis.Redis(
             host=settings.REDIS_HOST,
             port=settings.REDIS_PORT,
             db=settings.REDIS_DB,
-            decode_responses=True
+            decode_responses=True,
         )
-    
+
     def get(self, key: str) -> Optional[Any]:
         """Obtiene un valor de la caché."""
         try:
@@ -29,22 +30,18 @@ class RedisCache:
         except Exception as e:
             logger.error(f"Error al obtener valor de caché: {str(e)}")
         return None
-    
+
     def set(self, key: str, value: Any, expire: int = 3600) -> bool:
         """Almacena un valor en la caché."""
         try:
             if isinstance(value, BaseModel):
                 value = value.dict()
-            self.redis_client.setex(
-                key,
-                expire,
-                json.dumps(value)
-            )
+            self.redis_client.setex(key, expire, json.dumps(value))
             return True
         except Exception as e:
             logger.error(f"Error al almacenar valor en caché: {str(e)}")
             return False
-    
+
     def delete(self, key: str) -> bool:
         """Elimina un valor de la caché."""
         try:
@@ -53,11 +50,11 @@ class RedisCache:
         except Exception as e:
             logger.error(f"Error al eliminar valor de caché: {str(e)}")
             return False
-    
+
     def exists(self, key: str) -> bool:
         """Verifica si una clave existe en la caché."""
         try:
             return bool(self.redis_client.exists(key))
         except Exception as e:
             logger.error(f"Error al verificar existencia en caché: {str(e)}")
-            return False 
+            return False
