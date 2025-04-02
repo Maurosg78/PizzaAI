@@ -1,6 +1,6 @@
 import json
 import os
-from typing import Dict, List, Optional
+from typing import Dict, List
 
 import numpy as np
 from pydantic import BaseModel
@@ -136,7 +136,6 @@ class DoughFormulator:
         """Calcular proporciones iniciales basadas en propiedades objetivo"""
         # Calcular proporciones basadas en valores nutricionales objetivo
         proportions = []
-        total_nutrients = sum(ingredient.nutritional_value.values())
 
         for nutrient, target_value in target_properties.items():
             if nutrient in ingredient.nutritional_value:
@@ -285,3 +284,11 @@ class DoughFormulator:
                         total_weight += proportion
 
         return viability_score / total_weight if total_weight > 0 else 0.5
+
+    def _calculate_nutritional_score(self, nutrients: Dict[str, float]) -> float:
+        """Calcula el puntaje nutricional basado en los nutrientes."""
+        score = 0.0
+        for nutrient, value in nutrients.items():
+            if nutrient in self.nutrient_weights:
+                score += value * self.nutrient_weights[nutrient]
+        return score

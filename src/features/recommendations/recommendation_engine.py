@@ -1,9 +1,9 @@
-from typing import Dict, List, Optional
+from typing import Dict, List
 
 import numpy as np
 from pydantic import BaseModel
 
-from src.core.services.usda_service import FoodItem, NutrientInfo, USDAService
+from src.core.services.usda_service import FoodItem, USDAService
 from src.features.nutrition.nutrition_analyzer import NutritionAnalyzer
 
 

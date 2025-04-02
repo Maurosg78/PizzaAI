@@ -6,9 +6,8 @@ import pytest
 import pytest_asyncio
 from pydantic import SecretStr
 
-from src.core.cache.redis_cache import RedisCache
 from src.core.config import settings
-from src.core.services.usda_service import FoodItem, NutrientInfo, USDAService, USDAServiceError
+from src.core.services.usda_service import USDAService, USDAServiceError
 
 
 @pytest.fixture(autouse=True)

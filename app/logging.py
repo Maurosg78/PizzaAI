@@ -7,22 +7,22 @@ from .config import settings
 
 def setup_logging(
     level: Optional[str] = None,
-    format: Optional[str] = None
+    log_format: Optional[str] = None
 ) -> None:
     """Configure logging for the application.
 
     Args:
         level: Logging level (default: from settings)
-        format: Log format string (default: from settings)
+        log_format: Log format string (default: from settings)
     """
     # Set level and format from settings if not provided
     level = level or settings.LOG_LEVEL
-    format = format or settings.LOG_FORMAT
+    log_format = log_format or settings.LOG_FORMAT
 
     # Configure root logger
     logging.basicConfig(
         level=level,
-        format=format,
+        format=log_format,
         handlers=[
             logging.StreamHandler(sys.stdout),
             logging.FileHandler(f'logs/app_{datetime.now().strftime("%Y%m%d")}.log')

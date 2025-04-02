@@ -21,42 +21,44 @@ wheels/
 *.egg
 
 # Virtual Environment
-.env
-.venv
-env/
 venv/
 ENV/
+env/
 
 # IDE
 .idea/
 .vscode/
 *.swp
 *.swo
-.DS_Store
 
 # Testing
-.coverage
-coverage.xml
-htmlcov/
 .pytest_cache/
-.tox/
+htmlcov/
+.coverage
+*.cover
+.hypothesis/
+
+# Jupyter Notebook
+.ipynb_checkpoints
 
 # Logs
 *.log
 logs/
-log/
 
 # Local development
-*.db
-*.sqlite3
-uploads/
-
-# Jupyter Notebook
-.ipynb_checkpoints
-*.ipynb
-
-# Environment variables
+.env
 .env.local
 
-# OS
+# Results and data
+resultados_main/
+*.csv
+*.json
+!requirements.json
+
+# Documentation
+docs/_build/
+site/
+
+# System Files
+.DS_Store
 Thumbs.db

@@ -5,7 +5,7 @@ Script para crear issues en GitHub desde un archivo JSON.
 
 import json
 import os
-from typing import Dict, List
+from typing import List
 
 import requests
 

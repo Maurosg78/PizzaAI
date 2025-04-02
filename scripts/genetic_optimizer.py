@@ -1,16 +1,23 @@
+# flake8: noqa: E402
+import matplotlib
+matplotlib.use("Agg")  # Evita abrir ventanas gráficas
+
 import datetime
 import logging
 import os
 import random
-
-import matplotlib
-import pandas as pd
-
-matplotlib.use("Agg")  # Evita abrir ventanas gráficas
 from functools import partial
+from typing import Dict, List, Optional
 
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 from deap import base, creator, tools
+from pydantic import BaseModel
+
+from src.core.models.ingredient import Ingredient
+from src.core.models.recipe import Recipe
+from src.core.services.usda_service import USDAService
 
 # ----------------------------------------------------------------------
 # 1. CONFIGURACIÓN DE LOGGING Y CARPETAS

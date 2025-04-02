@@ -1,7 +1,6 @@
 import logging
-from typing import Dict, List, Optional
+from typing import Dict, List
 
-from src.core.config import settings
 from src.core.services.usda_service import USDAService
 
 logger = logging.getLogger(__name__)

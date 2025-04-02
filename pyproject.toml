@@ -19,4 +19,18 @@ line_length = 100
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
-addopts = "-ra -q" 
+addopts = "-ra -q"
+
+[tool.flake8]
+max-line-length = 100
+exclude = .git,__pycache__,build,dist
+per-file-ignores =
+    __init__.py:F401
+    tests/*:E501
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+check_untyped_defs = true 
