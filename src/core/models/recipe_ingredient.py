@@ -1,21 +1,27 @@
-from sqlalchemy import Column, Float, ForeignKey, Integer, String
+from datetime import datetime
+from typing import Optional
+from sqlalchemy import Column, Integer, Float, String, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
-
-from .base import Base
+from src.core.models.base import Base
 
 
 class RecipeIngredient(Base):
-    """Modelo para la relación entre recetas e ingredientes."""
+    """Modelo de relación entre recetas e ingredientes."""
 
     __tablename__ = "recipe_ingredients"
 
-    recipe_id = Column(Integer, ForeignKey("recipes.id"), primary_key=True)
-    ingredient_id = Column(Integer, ForeignKey("ingredients.id"), primary_key=True)
-    quantity = Column(Float, nullable=False)
-    unit = Column(String(20), nullable=False)
-    created_at = Column(String, default="2025-04-02 18:10:17.102775")
-    updated_at = Column(String, default="2025-04-02 18:10:17.102776")
+    id = Column(Integer, primary_key=True, index=True)
+    recipe_id = Column(Integer, ForeignKey("recipes.id"), nullable=False)
+    ingredient_id = Column(Integer, ForeignKey("ingredients.id"), nullable=False)
+    amount = Column(Float, nullable=False)  # cantidad en gramos
+    unit = Column(String, nullable=False)  # unidad de medida
+    notes = Column(String)  # notas adicionales (opcional)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     # Relaciones
-    recipe = relationship("Recipe", back_populates="recipe_ingredients")
+    recipe = relationship("Recipe", back_populates="ingredients")
     ingredient = relationship("Ingredient", back_populates="recipe_ingredients")
+
+    def __repr__(self):
+        return f"<RecipeIngredient {self.ingredient.name} in {self.recipe.name}>"

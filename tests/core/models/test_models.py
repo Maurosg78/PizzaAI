@@ -3,7 +3,7 @@ import unittest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from src.core.models import Base, Ingredient, Recipe, RecipeIngredient
+from src.core.models import Base, Ingredient, Recipe, RecipeIngredient, User, UserRole
 
 
 class TestModels(unittest.TestCase):
@@ -13,6 +13,18 @@ class TestModels(unittest.TestCase):
         Base.metadata.create_all(self.engine)
         self.Session = sessionmaker(bind=self.engine)
         self.session = self.Session()
+        
+        # Crear un usuario para las pruebas
+        self.test_user = User(
+            email="test@example.com",
+            username="testuser",
+            hashed_password="hashedpassword",
+            full_name="Test User",
+            role=UserRole.USER,
+            is_active=True
+        )
+        self.session.add(self.test_user)
+        self.session.commit()
 
     def tearDown(self):
         self.session.close()
@@ -22,13 +34,12 @@ class TestModels(unittest.TestCase):
         ingredient = Ingredient(
             name="Tomato",
             description="Fresh tomato",
-            usda_fdc_id=12345,
+            usda_id="12345",
             category="Vegetable",
-            unit="g",
-            calories_per_unit=0.18,
-            protein_per_unit=0.009,
-            carbs_per_unit=0.039,
-            fat_per_unit=0.002,
+            calories_per_100g=18,
+            protein_per_100g=0.9,
+            carbs_per_100g=3.9,
+            fat_per_100g=0.2,
         )
         self.session.add(ingredient)
         self.session.commit()
@@ -43,12 +54,12 @@ class TestModels(unittest.TestCase):
             name="Margherita Pizza",
             description="Classic Italian pizza",
             instructions="Mix ingredients and bake",
-            prep_time=20,
-            cook_time=15,
+            preparation_time=20,
+            cooking_time=15,
             servings=4,
             difficulty="medium",
-            category="Italian",
-            tags=["pizza", "italian", "vegetarian"],
+            author_id=self.test_user.id,
+            image_url="http://example.com/pizza.jpg",
         )
         self.session.add(recipe)
         self.session.commit()
@@ -61,7 +72,9 @@ class TestModels(unittest.TestCase):
         """Prueba la relación entre recetas e ingredientes."""
         # Crear ingrediente
         ingredient = Ingredient(
-            name="Tomato", description="Fresh tomato", category="Vegetable", unit="g"
+            name="Tomato", 
+            description="Fresh tomato", 
+            category="Vegetable",
         )
         self.session.add(ingredient)
 
@@ -70,22 +83,26 @@ class TestModels(unittest.TestCase):
             name="Margherita Pizza",
             description="Classic Italian pizza",
             instructions="Mix ingredients and bake",
+            author_id=self.test_user.id,
         )
         self.session.add(recipe)
         self.session.commit()
 
         # Crear relación
         recipe_ingredient = RecipeIngredient(
-            recipe=recipe, ingredient=ingredient, quantity=200, unit="g"
+            recipe=recipe, 
+            ingredient=ingredient, 
+            amount=200, 
+            unit="g"
         )
         self.session.add(recipe_ingredient)
         self.session.commit()
 
         # Verificar relación
         saved_recipe = self.session.query(Recipe).first()
-        self.assertEqual(len(saved_recipe.recipe_ingredients), 1)
-        self.assertEqual(saved_recipe.recipe_ingredients[0].quantity, 200)
-        self.assertEqual(saved_recipe.recipe_ingredients[0].ingredient.name, "Tomato")
+        self.assertEqual(len(saved_recipe.ingredients), 1)
+        self.assertEqual(saved_recipe.ingredients[0].amount, 200)
+        self.assertEqual(saved_recipe.ingredients[0].ingredient.name, "Tomato")
 
 
 if __name__ == "__main__":

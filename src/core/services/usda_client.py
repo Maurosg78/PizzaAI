@@ -3,7 +3,7 @@ from typing import Dict, Optional
 
 import requests
 
-from src.core.config import settings
+from src.core.config import get_settings
 
 logger = logging.getLogger(__name__)
 
@@ -11,9 +11,10 @@ logger = logging.getLogger(__name__)
 class USDAClient:
     """Cliente para interactuar con la API de USDA."""
 
-    def __init__(self):
+    def __init__(self, api_key=None):
         """Inicializa el cliente con la configuración necesaria."""
-        self.api_key = settings.USDA_API_KEY
+        settings = get_settings()
+        self.api_key = api_key or settings.USDA_API_KEY
         self.base_url = settings.USDA_API_BASE_URL
         self.session = requests.Session()
         self.session.headers.update({"X-Api-Key": self.api_key, "Content-Type": "application/json"})

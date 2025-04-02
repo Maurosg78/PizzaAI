@@ -1,13 +1,28 @@
-from typing import Dict, List
+from typing import Dict, List, Optional
 
+from pydantic import BaseModel
 from src.core.cache.redis_cache import RedisCache
 from src.core.services.usda_client import USDAClient
+
+
+class NutrientInfo(BaseModel):
+    """Información sobre un nutriente."""
+    name: str
+    amount: float
+    unit: str
+
+
+class FoodItem(BaseModel):
+    """Modelo para un alimento de la API de USDA."""
+    fdcId: str
+    description: str
+    nutrients: List[NutrientInfo] = []
 
 
 class USDAService:
     """Servicio para interactuar con la API de USDA."""
 
-    def __init__(self, api_key: str, cache: RedisCache = None):
+    def __init__(self, api_key: str = None, cache: RedisCache = None):
         """Inicializa el servicio USDA."""
         self.client = USDAClient(api_key)
         self.cache = cache
@@ -21,6 +36,8 @@ class USDAService:
                 return cached_result
 
         result = self.client.search_foods(query, page_size)
+        if "foods" in result:
+            result = result["foods"]
 
         if self.cache:
             self.cache.set(cache_key, result, expire=3600)  # Cache por 1 hora

@@ -3,6 +3,10 @@ Servicios de PizzaAI
 """
 
 from .simple_recommender import SimpleRecommender
-from .usda_service import FoodItem, NutrientInfo, usda_service
+from .usda_service import USDAService
+from ..config import get_settings
 
-__all__ = ["usda_service", "NutrientInfo", "FoodItem", "SimpleRecommender"]
+settings = get_settings()
+usda_service = USDAService(api_key=settings.USDA_API_KEY)
+
+__all__ = ["usda_service", "USDAService", "SimpleRecommender"]

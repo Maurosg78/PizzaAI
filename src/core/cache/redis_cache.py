@@ -5,7 +5,7 @@ from typing import Any, Optional
 import redis
 from pydantic import BaseModel
 
-from ..config import settings
+from ..config import get_settings
 
 logger = logging.getLogger(__name__)
 
@@ -14,6 +14,7 @@ class RedisCache:
     """Servicio de caché usando Redis."""
 
     def __init__(self):
+        settings = get_settings()
         self.redis_client = redis.Redis(
             host=settings.REDIS_HOST,
             port=settings.REDIS_PORT,

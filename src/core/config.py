@@ -1,21 +1,39 @@
 from typing import List, Optional, Union
 
-from pydantic import Field, SecretStr
+from pydantic import Field, SecretStr, PostgresDsn, validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from functools import lru_cache
 
 
 class Settings(BaseSettings):
+    # Configuración de la base de datos
+    POSTGRES_USER: str
+    POSTGRES_PASSWORD: str
+    POSTGRES_HOST: str
+    POSTGRES_PORT: str
+    POSTGRES_DB: str
+    
+    # URL de conexión a la base de datos
+    DATABASE_URL: str = Field(
+        default="postgresql://postgres:postgres@localhost:5432/pizzaai",
+        env="DATABASE_URL"
+    )
+    
+    @validator("DATABASE_URL", pre=True)
+    def assemble_db_connection(cls, v: Optional[str], values: dict[str, any]) -> any:
+        if isinstance(v, str) and v.startswith("postgresql://"):
+            return v
+        return f"postgresql://{values.get('POSTGRES_USER')}:{values.get('POSTGRES_PASSWORD')}@{values.get('POSTGRES_HOST')}:{values.get('POSTGRES_PORT')}/{values.get('POSTGRES_DB')}"
+    
     # Configuración de la aplicación
-    APP_NAME: str = Field(default="PizzaAI", env="APP_NAME")
-    DEBUG: bool = Field(default=False, env="DEBUG")
+    APP_NAME: str = "PizzaAI"
+    DEBUG: bool = False
     API_V1_STR: str = "/api/v1"
 
     # Configuración de seguridad
-    SECRET_KEY: SecretStr = Field(default="tu_clave_secreta_aqui")
+    SECRET_KEY: str
+    ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
-
-    # Configuración de la base de datos
-    DATABASE_URL: str = "sqlite:///./pizzaai.db"
 
     # Configuración de CORS
     BACKEND_CORS_ORIGINS: List[str] = Field(default=["*"])
@@ -78,4 +96,6 @@ class Settings(BaseSettings):
 
 
 # Crear una instancia global de la configuración
-settings = Settings()
+@lru_cache()
+def get_settings() -> Settings:
+    return Settings()
